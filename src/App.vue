@@ -1,73 +1,51 @@
 <template>
    <!-- html 코드 -->
-   <h1>영화 정보</h1>
-   <div v-for="(movie, i) in data" :key="i" class="item">
-      <figure>
-         <img :src="`${movie.ImgUrl}`" :alt="movie.title" />
-      </figure>
-      <!-- 데이터 바인딩 -->
-      <!-- 속성에 값을 바인딩 할 때는 :속성명="데이터" 를 사용하면 됨(vue문법) -->
-      <div class="info">
-         <h3 class="title" :style="textRed">{{ movie.title }}</h3>
-         <p>개봉 : {{ movie.year }}</p>
-         <p>장르 : {{ movie.category }}</p>
-         <button @:click="increaseLike(i)">좋아요</button>
-         <span>{{ movie.like }}</span>
-         <p>
-            <button @:click="isModal = true">상세보기</button>
-         </p>
-      </div>
-   </div>
-   <div class="modal" v-if="isModal">
-      <div class="inner">
-         <h3>Detail</h3>
-         <p>영화 상세 정보</p>
-         <button @:click="isModal = false">닫기</button>
-      </div>
-   </div>
+   <Navbar />
+   <Event :text="text" />
+   <Movies
+      :data="data"
+      @openModal="
+         isModal = true;
+         selectedMovie = $event;
+      "
+      @increaseLike="increaseLike($event)" />
+   <Modal :data="data" :isModal="isModal" :selectedMovie="selectedMovie" @closeModal="isModal = false" />
+
    <!-- 반복문을 사용할때는 각각의 자료를 구분하기 위한 key값이 반드시 필요 -->
    <!-- <p v-for="(item, i) in foods" :key="i">{{ item }}</p> -->
 </template>
 
 <script>
 // js 코드
+import data from './assets/movies';
+import Navbar from './components/Navbar.vue';
+import Modal from './components/Modal.vue';
+import Event from './components/Event.vue';
+import Movies from './components/Movies.vue';
+
+console.log(data);
+
 export default {
    name: 'App',
    data() {
       return {
-         isModal: true,
+         isModal: false,
          // 변수 지정
-         //  foods: ['김밥', '순대', '만두']
-         data: [
-            {
-               title: '노량',
-               year: 2023,
-               category: '액션, 드라마',
-               textRed: 'color: red',
-               like: 0,
-               ImgUrl: './assets/노량.jpg',
-            },
-            {
-               title: '아쿠아맨과 로스트 킹덤',
-               year: 2023,
-               category: '액션, 판타지, 어드벤처',
-               like: 0,
-               ImgUrl: './assets/아쿠아맨.jpg',
-            },
-            {
-               title: '3일의 휴가',
-               year: 2023,
-               category: '판타지, 드라마',
-               like: 0,
-               ImgUrl: './assets/3일의휴가.jpg',
-            },
-         ],
+         data: data,
+         selectedMovie: 0,
+         text: 'NETFILX 강렬한 운명의 드라마, 경성크리처',
       };
    },
    methods: {
       increaseLike(i) {
          this.data[i].like += 1;
       },
+   },
+   components: {
+      Navbar: Navbar,
+      Modal: Modal,
+      Event: Event,
+      Movies: Movies,
    },
 };
 </script>
@@ -82,7 +60,7 @@ export default {
 body {
    max-width: 768px;
    margin: 0 auto;
-   padding: 20px;
+   /* padding: 20px; */
 }
 
 h1,
